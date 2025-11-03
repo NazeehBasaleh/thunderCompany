@@ -1,9 +1,15 @@
 <template>
-    <Home/>
-    <About/>
-    <Services/>
-    <Projects/>
-    <Contact/>
+  <div class="pt-[70px]">
+    <!-- عرض كل الصفحات فقط عند route الاسم all -->
+    <Home v-if="$route.name === 'all'" />
+    <About v-if="$route.name === 'all'" />
+    <Services v-if="$route.name === 'all'" />
+    <Projects v-if="$route.name === 'all'" />
+    <Contact v-if="$route.name === 'all'" />
+
+    <!-- أو عرض صفحة واحدة حسب route آخر -->
+    <router-view v-else />
+  </div>
 </template>
 
 <script>

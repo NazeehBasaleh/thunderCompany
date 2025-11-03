@@ -1,24 +1,26 @@
 <template>
-    <section id="services">
-      <main class="text-center">
+    <section id="services" :key="$i18n.locale">
+      <main class="text-center mt-5">
         <h1 class="section-titel">{{$t('services.main_title')}}</h1>
         <p class="text-base text-[#000] mb-5 px-8 font-medium">{{$t('services.slogan')}}</p>
       </main>
       <div class="container py-5 px-4 grid gap-3">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 py-5">
-          <div class="card overflow-hidden relative" v-for="(item,index) in 4" :key="index">
-            <div class="relative w-full h-[30%]">
-              <img :src="Gemini1" alt="" class="w-full h-full object-fill" />
+          <div class="card overflow-hidden relative h-[400px]" v-for="(item,index) in services" :key="index">
+            <div class="relative h-[140px]">
+              <img :src="Gemini1" alt="" class="w-full h-full object-cover" />
               <div class="absolute w-full h-full inset-0 l-gradient"></div>
+              <div class="absolute w-28 h-28 bottom-[-50px] transform rounded-full bg-white flex justify-center items-center" :class="locale.value === 'ar' ? 'right-[20px]' : 'left-[20px]'">
+                <img :src="item.img" alt="" class="w-24 h-24 rounded-full bg-[#123DA5] object-fill p-2" />
+              </div>
             </div>
 
-            <div class="p-4 grid gap-4 relative -top-20">
-              <div class="w-28 h-28  rounded-full bg-white flex justify-center items-center">
-                <img :src="Gem1" alt="" class="w-24 h-24 rounded-full bg-[#123DA5] object-fill p-2" />
+            <div class="p-4 mt-10 flex flex-col justify-between h-[220px]">
+              <div class="space-y-4">
+                <h2 class="font-bold text-base text-[#123DA5]">{{ item.title }}</h2>
+                <p class="text-[14px]">{{ item.description }}</p>
               </div>
-              <h2>نقل المواد السائلة والجافة</h2>
-              <p>تُقدم حلول نقل متخصصة للمواد البترولية والمعدات الثقيلة والزراعية، حتى في أصعب الظروف.</p>
-              <span>تواصل معنا</span>
+              <span class="font-normal text-sm text-[#123DA5] hover:text-[#b60910]">{{ t('services.cta') }}</span>
             </div>
           </div>
         </div>
@@ -35,7 +37,7 @@
           <div class="absolute w-full h-full flex items-center justify-end">
             <img :src="Gemini2" alt="" class="inset-0 w-3/5 md:w-2/5 h-full object-cover z-0" />
           </div>
-          <div class="absolute inset-0 ads z-10 " :class="locale === 'ar' ? 'gradient-ar' : 'gradient-en'"></div>
+          <div class="absolute inset-0 ads z-10 " :class="locale.value === 'ar' ? 'gradient-ar' : 'gradient-en'"></div>
           <div class="relative z-20 p-4 justify-center w-3/5 md:w-2/5">
             <h2 class="section-titel text-white text-base font-bold">{{t('services.why_us.main_title')}}</h2>
             <div class="px-1">
@@ -52,11 +54,15 @@ import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import Gemini2 from '../assets/img/contact.png';
 import Gemini1 from '../assets/img/Gemini_2.png';
-import Gem1 from '../assets/img/Gem 2.png';
+import Services1 from '../assets/img/Services1.png';
+import Services2 from '../assets/img/Services2.png';
+import Services3 from '../assets/img/Services3.png';
+import Services4 from '../assets/img/Services4.png';
 export default {
   name: 'Services',
   setup() {
-    const { t, tm , locale} = useI18n()
+    const { t, tm ,locale} = useI18n()
+
      const features = computed(() => {
       // 1) جرّب tm أولاً (tm يعطيك الكائن/المصفوفة إذا موجودة في الموارد)
       const raw = typeof tm === 'function' ? tm('services.why_us.features') : null
@@ -65,14 +71,32 @@ export default {
       // 2) fallback: استخدم t مع returnObjects (بعض الإصدارات تحتاج هذا الخيار)
       const maybe = typeof t === 'function' ? t('services.why_us.features', {}, { returnObjects: true }) : []
       return Array.isArray(maybe) ? maybe : []
-    })
+    }) 
+    const services = computed(() => {
+   
+      const raw = typeof tm === 'function' ? tm('services.list') : null
+      if (Array.isArray(raw) && raw.length > 0) {return raw.map((item, index) => ({
+          img: [Services1, Services2, Services3, Services4][index],
+          title: item.title,
+          description: item.description
+        }));}
+
+      const maybe = typeof t === 'function' ? t('services.list', {}, { returnObjects: true }) : []
+      if (Array.isArray(maybe) && maybe.length > 0) {return maybe.map((item, index) => ({
+          img: [Services1, Services2, Services3, Services4][index],
+          title: item.title,
+          description: item.description
+        }));}
+
+   })
 
     return {
+      services,
       locale,
       features,
       Gemini2,
       Gemini1,
-      Gem1,
+      Services1,
       t
     }
   }
@@ -94,7 +118,7 @@ export default {
 }
 
 .card{
-  @apply  rounded-2xl bg-white shadow-sm hover:shadow-sm hover:shadow-[#123DA5] transition-shadow duration-300;
+  @apply  rounded-2xl bg-white shadow-sm hover:shadow-sm hover:shadow-[#123DA5] transition-shadow duration-300 hover:border-b-2 border-[#b60910];
 
   .l-gradient{
     background:  linear-gradient(#123DA500 50%, #123DA5 100%);

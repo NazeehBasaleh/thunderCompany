@@ -40,14 +40,10 @@ export default {
     const { t, tm } = useI18n()
 
     const cards = computed(() => {
-      // 1) جرّب tm أولاً (tm يعطيك الكائن/المصفوفة إذا موجودة في الموارد)
       const raw = typeof tm === 'function' ? tm('home.cards') : null
       if (Array.isArray(raw)) return raw
-
-      // 2) fallback: استخدم t مع returnObjects (بعض الإصدارات تحتاج هذا الخيار)
-      const maybe = typeof t === 'function' ? t('home.cards', {}, { returnObjects: true }) : []
-      return Array.isArray(maybe) ? maybe : []
     })
+    
     return { 
       cards,
       t

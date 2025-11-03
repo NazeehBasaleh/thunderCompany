@@ -3,9 +3,9 @@
     <div class="container mx-auto nav-container">
       <div class="flex justify-between items-center w-full md:px-10 py-3 px-3">
         <!-- Logo -->
-        <router-link :to="`/`">
+        <router-link :to="`/${currentLang}`">
           <div class="logo flex gap-3">
-            <img src="/src/assets/img/Logo.png" class="bg-[#ffffff] p-2 rounded-2xl" alt="" width="50">
+            <img :src="logo" class="bg-[#ffffff] p-2 rounded-2xl" alt="" width="50">
             <div class="text-logo place-content-center">
               <h1>{{ $t('app.name1') }} <span>{{ $t('app.name2') }}</span></h1>
             </div>
@@ -110,12 +110,18 @@
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '../stores/app'
 import { computed } from 'vue'
+import { i18n } from '../i18n'
+import  router  from '../router/index'
+
+import logo from '/src/assets/img/Logo.png'
 
 export default {
   name: 'HeaderComponent',
   setup() {
-    const { t, locale } = useI18n()
+    const { t ,locale } = useI18n()
     const appStore = useAppStore()
+
+    const currentLang = computed(() => appStore.language)
 
     // حل بديل إذا كان مفتاح nav غير موجود
     const navItems = computed(() => {
@@ -123,30 +129,49 @@ export default {
       
       // إذا لم يكن مفتاح nav موجوداً، نعود بقيم افتراضية
       if (typeof navTranslation === 'string' && navTranslation === 'nav') {
+        const lang = currentLang.value
         return {
-          home: locale.value === 'ar' ? 'الرئيسية' : 'Home',
-          about: locale.value === 'ar' ? 'عن الشركة' : 'About Us',
-          services: locale.value === 'ar' ? 'خدماتنا' : 'Services',
-          projects: locale.value === 'ar' ? 'مشاريعنا' : 'Projects',
-          contact: locale.value === 'ar' ? 'اتصل بنا' : 'Contact Us',
+          home: lang === 'ar' ? 'الرئيسية' : 'Home',
+          about: lang === 'ar' ? 'عن الشركة' : 'About Us',
+          services: lang === 'ar' ? 'خدماتنا' : 'Services',
+          projects: lang === 'ar' ? 'مشاريعنا' : 'Projects',
+          contact: lang === 'ar' ? 'اتصل بنا' : 'Contact Us',
         }
       }
       
       return navTranslation
     })
 
-    const currentLang = computed(() => locale.value)
 
     const switchLanguage = (lang) => {
+      const route = router.currentRoute.value
+      const currentPath = route.fullPath
+        
+      // إزالة اللغة الحالية من بداية الرابط (سواء ar أو en)
+      const pathWithoutLang = currentPath.replace(/^\/(ar|en)/, '')
+        
+      // بناء الرابط الجديد مع اللغة المطلوبة
+      const newPath = `/${lang}${pathWithoutLang}`
+        
+      // تحديث اللغة داخل i18n والمتجر
       appStore.setLanguage(lang)
       locale.value = lang
-      
-      
+      i18n.global.locale = lang
+      localStorage.setItem('lang', lang)
+        
+      // تحديث اتجاه الصفحة
       document.documentElement.lang = lang
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+        
+      // الانتقال للرابط الجديد بدون إعادة تحميل
+      if (newPath !== currentPath) {
+        router.push(newPath)
+      }
     }
 
-    return { 
+
+    return {
+      logo, 
       navItems, 
       currentLang, 
       switchLanguage,
@@ -191,6 +216,14 @@ export default {
     clickEn(){
       this.switchLanguage('en');
       this.closeMobileLang();
+    },
+    handleClickOutside(event) {
+      const langMenu = this.$el.querySelector('.lang-popup-menu');
+      const btnLang = this.$el.querySelector('.btn-lang');
+
+      if (this.mobileLangOpen && !langMenu.contains(event.target) && !btnLang.contains(event.target)) {
+        this.closeMobileLang();
+      }
     }
   },
   mounted() {

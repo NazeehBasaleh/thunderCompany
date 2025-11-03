@@ -2,21 +2,26 @@
   <div :class="{'rtl': isRtl, 'ltr': !isRtl}">
     <HeaderComponent style="position: fixed;z-index: 1000;" />
     <router-view />  
-    <FooterComponent />
+    <AppFooter />
   </div>
 </template>
 
 <script>
 import { useAppStore } from './stores/app'
 import HeaderComponent from './components/CustomHeader.vue'
-import FooterComponent from './components/CustomFooter.vue'
-
+import AppFooter from './components/CustomFooter.vue'
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'App',
   components: {
     HeaderComponent,
-    FooterComponent
+    AppFooter
+  },
+  setup() {
+    const { locale } = useI18n()   // <-- expose locale
+    
+    return { locale }
   },
   computed: {
     isRtl() {
@@ -24,12 +29,6 @@ export default {
       return appStore.isRtl
     }
   },
-  created() {
-    // تعيين اتجاه الصفحة عند التحميل
-    const appStore = useAppStore()
-    document.documentElement.dir = appStore.isRtl ? 'rtl' : 'ltr'
-    document.documentElement.lang = appStore.language
-  }
 }
 </script>
 
@@ -43,5 +42,4 @@ export default {
   direction: ltr;
   text-align: left;
 }
-
 </style>

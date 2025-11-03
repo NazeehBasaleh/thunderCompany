@@ -51,9 +51,9 @@ import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import { useAppStore } from '../stores/app'
 export default {
-  name: 'footer',
+  name: 'AppFooter',
   setup() {
-    const { t,tm, locale } = useI18n()
+    const { t,tm } = useI18n()
     const appStore = useAppStore()
 
     const links = computed(() => {
@@ -80,15 +80,7 @@ export default {
       return Array.isArray(maybe) ? maybe : []
     })
 
-    const switchLanguage = (lang) => {
-      appStore.setLanguage(lang)
-      locale.value = lang
-      
-      
-      document.documentElement.lang = lang
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
-    }
-    return {links,ourServices,ourLocations,switchLanguage,t}
+    return {links,ourServices,ourLocations,t}
   },
 }
 </script>
