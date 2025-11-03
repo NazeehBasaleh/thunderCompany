@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n'
-import ar from '/public/locales/ar.json'
-import en from '/public/locales/en.json'
+import ar from './locales/ar.json'
+import en from './locales/en.json'
 
 const savedLang = localStorage.getItem('lang') || 'ar'
 const messages = {
